@@ -5,9 +5,10 @@
   "main": "build/index.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production babel -D src -d build",
-    "lint": "eslint src",
     "build:dev": "cross-env NODE_ENV=development babel -D -w src --out-dir build",
     "clean": "rm -rf build",
+    "lint": "eslint src",
+    "prepublish": "npm run build",
     "test": "exit 0"
   },
   "repository": {
