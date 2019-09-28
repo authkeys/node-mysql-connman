@@ -1,0 +1,59 @@
+{
+  "name": "@authkeys/mysql-connman",
+  "version": "0.1.0",
+  "description": "Opinionated mysql2 connection manager",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production babel -D src -d build",
+    "lint": "eslint src",
+    "build:dev": "cross-env NODE_ENV=development babel -D -w src --out-dir build",
+    "clean": "rm -rf build",
+    "test": "exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/authkeys/node-mysql-connman.git"
+  },
+  "keywords": [
+    "node",
+    "mysql",
+    "mariadb"
+  ],
+  "author": "Michele Azzolari <macno@authkeys.io> (macno)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/authkeys/node-mysql-connman/issues"
+  },
+  "homepage": "https://github.com/authkeys/node-mysql-connman#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.5.5",
+    "@istanbuljs/nyc-config-babel": "^2.1.1",
+    "babel-plugin-istanbul": "^5.2.0",
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
+    "mocha": "^6.0.2",
+    "mocha-junit-reporter": "^1.18.0",
+    "mocha-multi-reporters": "^1.1.7",
+    "mocha-parallel-tests": "^2.0.6-alpha.3",
+    "nyc": "^14.1.1"
+  },
+  "optionalDependencies": {
+    "babel-eslint": "^10.0.2",
+    "eslint": "^6.0.1",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-config-standard": "^13.0.1",
+    "eslint-plugin-import": "^2.18.1",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "prettier": "^1.5.3"
+  },
+  "dependencies": {
+    "mysql2": "^1.7.0"
+  }
+}

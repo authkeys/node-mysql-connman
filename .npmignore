@@ -1,0 +1,10 @@
+src/
+.gitlab-ci.yml
+.babelrc
+.dockerignore
+.env
+.idea/
+.eslintrc.json
+.nycrc.json
+mocha-config.json
+*.tgz
