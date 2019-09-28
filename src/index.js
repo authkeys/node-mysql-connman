@@ -57,5 +57,5 @@ class ConnectionManager {
     this.pool.end();
   }
 }
-
+export * from './settings';
 export default ConnectionManager;
