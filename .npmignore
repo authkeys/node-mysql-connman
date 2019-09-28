@@ -4,6 +4,8 @@ src/
 .dockerignore
 .env
 .idea/
+tests/
+reports/
 .eslintrc.json
 .nycrc.json
 mocha-config.json
