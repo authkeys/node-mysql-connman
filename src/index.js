@@ -29,7 +29,7 @@ class ConnectionManager {
       cluster.rw.forEach((node, i) => {
         const _config = Object.assign({}, config, {
           host: node.host,
-          port: node.port
+          port: node.port || 3306
         });
         this.pool.add('rw' + i, _config);
         nodes['rw' + i] = _config;
@@ -37,7 +37,7 @@ class ConnectionManager {
       cluster.ro.forEach((node, i) => {
         const _config = Object.assign({}, config, {
           host: node.host,
-          port: node.port
+          port: node.port || 3306
         });
         this.pool.add('ro' + i, _config);
         nodes['ro' + i] = _config;
