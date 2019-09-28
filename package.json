@@ -1,6 +1,6 @@
 {
   "name": "@authkeys/mysql-connman",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Opinionated mysql2 connection manager",
   "main": "build/index.js",
   "scripts": {
