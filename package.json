@@ -57,8 +57,5 @@
   },
   "dependencies": {
     "mysql2": "^1.7.0"
-  },
-  "config": {
-    "unsafe-perm": true
   }
 }

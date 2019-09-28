@@ -8,5 +8,5 @@ tests/
 reports/
 .eslintrc.json
 .nycrc.json
-mocha-config.json
+.mocharc.yaml
 *.tgz
