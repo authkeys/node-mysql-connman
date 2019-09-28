@@ -77,11 +77,11 @@ class MariadbPoolClient {
 
   run(sql, params) {
     return new Promise((resolve, reject) => {
-      this.conn.execute(sql, params, err => {
+      this.conn.execute(sql, params, (err, results, fields) => {
         if (err) {
           return reject(err);
         }
-        return resolve(true);
+        return resolve({ results, fields });
       });
     });
   }
