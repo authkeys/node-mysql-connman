@@ -47,7 +47,7 @@ const parseDbClusterEnv = function(string) {
   return config;
 };
 
-export const loadEnvSettings = function(settings = {}) {
+export const loadDbEnvSettings = function(settings = {}) {
   const {
     DB_USER,
     DB_PASSWORD,

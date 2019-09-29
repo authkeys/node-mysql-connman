@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { assert } from 'chai';
-import { loadEnvSettings } from '../src';
+import { loadDbEnvSettings } from '../src';
 
 const mergeObjects = (from, to) => {
   Object.keys(from).forEach(k => {
@@ -56,7 +56,7 @@ describe('Testing settings', () => {
   afterEach(function() {
     process.env = _env;
   });
-  describe('Testing loadEnvSettings', () => {
+  describe('Testing loadDbEnvSettings', () => {
     it('Should throw an error', done => {
       const config = {
         DB_USER: 'testuser',
@@ -66,7 +66,7 @@ describe('Testing settings', () => {
       mergeObjects(config, process.env);
       const settings = {};
       try {
-        loadEnvSettings(settings);
+        loadDbEnvSettings(settings);
         done(new Error('Not supposed to be here'));
       } catch (e) {
         assert.strictEqual('DB ERROR! mysql required DB_HOST or DB_CLUSTER', e.message);
@@ -82,7 +82,7 @@ describe('Testing settings', () => {
       mergeObjects(config, process.env);
       const settings = {};
       try {
-        loadEnvSettings(settings);
+        loadDbEnvSettings(settings);
         done(new Error('Not supposed to be here'));
       } catch (e) {
         assert.strictEqual('DB ERROR! mysql requires DB_NAME', e.message);
@@ -97,7 +97,7 @@ describe('Testing settings', () => {
       mergeObjects(config, process.env);
       const settings = {};
       try {
-        loadEnvSettings(settings);
+        loadDbEnvSettings(settings);
         done(new Error('Not supposed to be here'));
       } catch (e) {
         assert.strictEqual('DB ERROR! mysql requires DB_PASSWORD', e.message);
@@ -107,7 +107,7 @@ describe('Testing settings', () => {
     it('Should throw an error', done => {
       const settings = {};
       try {
-        loadEnvSettings(settings);
+        loadDbEnvSettings(settings);
         done(new Error('Not supposed to be here'));
       } catch (e) {
         assert.strictEqual('DB ERROR! mysql requires DB_USER', e.message);
@@ -117,7 +117,7 @@ describe('Testing settings', () => {
 
     it('Should throw an error', done => {
       try {
-        loadEnvSettings();
+        loadDbEnvSettings();
         done(new Error('Not supposed to be here'));
       } catch (e) {
         assert.strictEqual('DB ERROR! mysql requires DB_USER', e.message);
@@ -135,7 +135,7 @@ describe('Testing settings', () => {
       mergeObjects(config, process.env);
 
       try {
-        loadEnvSettings({});
+        loadDbEnvSettings({});
         done(new Error('Not supposed to be here xxx'));
       } catch (e) {
         assert.strictEqual('DB ERROR! Unable to parse DB_CLUSTER: no primary server defined', e.message);
@@ -153,7 +153,7 @@ describe('Testing settings', () => {
       mergeObjects(config, process.env);
 
       try {
-        loadEnvSettings({});
+        loadDbEnvSettings({});
         done(new Error('Not supposed to be here xxx'));
       } catch (e) {
         assert.strictEqual(
@@ -174,7 +174,7 @@ describe('Testing settings', () => {
       mergeObjects(config, process.env);
 
       try {
-        loadEnvSettings({});
+        loadDbEnvSettings({});
         done(new Error('Not supposed to be here xxx'));
       } catch (e) {
         assert.strictEqual(
@@ -195,7 +195,7 @@ describe('Testing settings', () => {
       mergeObjects(config, process.env);
 
       try {
-        loadEnvSettings({});
+        loadDbEnvSettings({});
         done(new Error('Not supposed to be here xxx'));
       } catch (e) {
         assert.strictEqual(
@@ -216,7 +216,7 @@ describe('Testing settings', () => {
       mergeObjects(config, process.env);
 
       try {
-        loadEnvSettings({});
+        loadDbEnvSettings({});
         done(new Error('Not supposed to be here xxx'));
       } catch (e) {
         assert.strictEqual('DB ERROR! Unable to parse DB_CLUSTER: Invalid string', e.message);
@@ -233,7 +233,7 @@ describe('Testing settings', () => {
         DB_PORT: 13306
       };
       mergeObjects(config, process.env);
-      const settings = loadEnvSettings({});
+      const settings = loadDbEnvSettings({});
       assert.strictEqual(settings.config.host, config.DB_HOST);
       assert.strictEqual(settings.config.database, config.DB_NAME);
       assert.strictEqual(settings.config.port, config.DB_PORT);
@@ -260,7 +260,7 @@ describe('Testing settings', () => {
         DB_SSL_CA: './tests/assets/ca-certificate.crt'
       };
       mergeObjects(config, process.env);
-      const settings = loadEnvSettings({});
+      const settings = loadDbEnvSettings({});
       assert.strictEqual(settings.config.host, config.DB_HOST);
       assert.strictEqual(settings.config.database, config.DB_NAME);
       assert.strictEqual(settings.config.port, 13306);
@@ -289,7 +289,7 @@ describe('Testing settings', () => {
         DB_SSL_CA: './tests/assets/ca-certificate.crt'
       };
       mergeObjects(config, process.env);
-      const settings = loadEnvSettings({
+      const settings = loadDbEnvSettings({
         config: { ssl: {}, connectionLimit: 1, queueLimit: 1, waitForConnections: false, timezone: 'GMT+1' },
         noDbPool: true
       });
@@ -317,7 +317,7 @@ describe('Testing settings', () => {
       };
       mergeObjects(config, process.env);
       const settings = {};
-      loadEnvSettings(settings);
+      loadDbEnvSettings(settings);
       assert.strictEqual(settings.config.host, config.DB_HOST);
       assert.strictEqual(settings.config.database, config.DB_NAME);
       assert.strictEqual(settings.config.port, 3306);
@@ -341,7 +341,7 @@ describe('Testing settings', () => {
           port: 13306
         }
       };
-      const settings = loadEnvSettings(config);
+      const settings = loadDbEnvSettings(config);
       assert.strictEqual(settings.config.host, config.config.host);
       assert.strictEqual(settings.config.database, config.config.database);
       assert.strictEqual(settings.config.port, config.config.port);
@@ -363,7 +363,7 @@ describe('Testing settings', () => {
         DB_CLUSTER: 'rw:host1:13306,ro:host2:13306'
       };
       mergeObjects(config, process.env);
-      const settings = loadEnvSettings({});
+      const settings = loadDbEnvSettings({});
       assert.isUndefined(settings.config.host);
       assert.isUndefined(settings.config.port);
       assert.strictEqual(settings.config.database, config.DB_NAME);
@@ -387,7 +387,7 @@ describe('Testing settings', () => {
         DB_CLUSTER: 'rw:host1:13306,ro:host2:13306,ro:host3:13306'
       };
       mergeObjects(config, process.env);
-      const settings = loadEnvSettings({});
+      const settings = loadDbEnvSettings({});
       assert.isUndefined(settings.config.host);
       assert.isUndefined(settings.config.port);
       assert.strictEqual(settings.config.database, config.DB_NAME);
@@ -412,7 +412,7 @@ describe('Testing settings', () => {
       };
       mergeObjects(config, process.env);
       const settings = {};
-      loadEnvSettings(settings);
+      loadDbEnvSettings(settings);
       done();
     });
 
@@ -424,7 +424,7 @@ describe('Testing settings', () => {
         DB_CLUSTER: 'rw:host1,ro:host2'
       };
       mergeObjects(config, process.env);
-      const settings = loadEnvSettings({});
+      const settings = loadDbEnvSettings({});
       assert.isUndefined(settings.config.host);
       assert.isUndefined(settings.config.port);
       assert.strictEqual(settings.config.database, config.DB_NAME);
