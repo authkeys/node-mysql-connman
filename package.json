@@ -56,6 +56,6 @@
     "prettier": "^1.5.3"
   },
   "dependencies": {
-    "mysql2": "^1.7.0"
+    "mysql2": "^2.0.0-alpha1"
   }
 }
