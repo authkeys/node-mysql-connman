@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import _UpgradeManager from './upgradeManager';
 import MariadbClusterClient from './clusterclient';
 import MariadbPoolClusterClient from './poolclusterclient';
 import MariadbClient from './client';
@@ -71,5 +72,7 @@ class ConnectionManager {
     this.pool.end();
   }
 }
-export * from './settings';
+
+export { loadDbEnvSettings } from './settings';
+export const UpgradeManager = _UpgradeManager;
 export default ConnectionManager;

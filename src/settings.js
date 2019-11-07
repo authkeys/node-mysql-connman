@@ -77,7 +77,6 @@ export const loadDbEnvSettings = function(settings = {}) {
       throw new Error('DB ERROR! mysql required DB_HOST or DB_CLUSTER');
     }
   }
-
   if (!settings.noDbPool) {
     settings.noDbPool = false;
   }
