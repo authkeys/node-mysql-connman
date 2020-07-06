@@ -29,11 +29,16 @@ class UpgradeManager {
 
   concurrent_mode;
 
-  constructor(connectionManager, logLevel = false, concurrent_mode = false) {
+  version_table = '_version';
+
+  constructor(connectionManager, logLevel = false, concurrent_mode = false, version_table_suffix = false) {
     this.connectionManager = connectionManager;
     assert(typeof concurrent_mode, 'boolean');
     this.concurrent_mode = concurrent_mode;
     initLogger(logLevel);
+    if (version_table_suffix) {
+      this.version_table = this.version_table + version_table_suffix;
+    }
   }
 
   async checkDb(targetVersion, onSchemaInit, onSchemaUpgrade) {
@@ -69,7 +74,7 @@ class UpgradeManager {
           await setTimeoutPromise(2000);
           this.checkDb();
         } else {
-          common_error('Unable to create _version table: [%s] %s', e.code, e.message);
+          common_error('Unable to create %s table: [%s] %s', this.version_table, e.code, e.message);
           process.exit(90);
         }
         return;
@@ -110,7 +115,7 @@ class UpgradeManager {
   }
 
   async getCurrentVersion(targetVersion) {
-    const sqlCheck = 'select value from _version';
+    const sqlCheck = `select value from ${this.version_table}`;
     if (this.concurrent_mode) {
       await this.client.run('SET AUTOCOMMIT=0');
       let row;
@@ -148,7 +153,7 @@ class UpgradeManager {
   }
 
   async createVersionTable() {
-    const sqlCreateTable = 'create table _version (value INTEGER PRIMARY KEY)';
+    const sqlCreateTable = `create table ${this.version_table} (value INTEGER PRIMARY KEY)`;
     try {
       await this.client.run(sqlCreateTable);
     } catch (e) {
@@ -156,13 +161,13 @@ class UpgradeManager {
       throw e;
     }
     try {
-      const sqlInsertVersionZero = 'insert into _version values (-1)';
+      const sqlInsertVersionZero = `insert into ${this.version_table} values (-1)`;
       await this.client.run(sqlInsertVersionZero);
       if (this.concurrent_mode) {
-        await this.client.run('select value from _version for update');
+        await this.client.run(`select value from ${this.version_table} for update`);
       }
     } catch (e) {
-      common_error('Unable to insert -1 version in _version table: [%s] %s', e.code, e.message);
+      common_error('Unable to insert -1 version in %s table: [%s] %s', this.version_table, e.code, e.message);
       throw e;
     }
     return 0;
@@ -184,7 +189,7 @@ class UpgradeManager {
   }
 
   async updateVersion(targetVersion) {
-    const sql = 'update _version set value = ?';
+    const sql = `update ${this.version_table} set value = ?`;
     if (this.concurrent_mode) {
       await this.client.run(sql, [targetVersion]);
       await this.client.run('COMMIT');
