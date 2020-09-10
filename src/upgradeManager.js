@@ -31,11 +31,17 @@ class UpgradeManager {
 
   version_table = '_version';
 
-  constructor(connectionManager, logLevel = false, concurrent_mode = false, version_table_suffix = false) {
+  constructor(
+    connectionManager,
+    logLevel = false,
+    concurrent_mode = false,
+    version_table_suffix = false,
+    logFn = undefined
+  ) {
     this.connectionManager = connectionManager;
     assert(typeof concurrent_mode, 'boolean');
     this.concurrent_mode = concurrent_mode;
-    initLogger(logLevel);
+    initLogger(logLevel, logFn);
     if (version_table_suffix) {
       this.version_table = this.version_table + version_table_suffix;
     }
@@ -53,7 +59,7 @@ class UpgradeManager {
       process.exit(99);
     }
     try {
-      const row = await this.getCurrentVersion();
+      const row = await this.getCurrentVersion(targetVersion);
       if (row === false) {
         currentVersion = -999;
       } else if (row) {
@@ -72,7 +78,7 @@ class UpgradeManager {
       } catch (e) {
         if (e.code === 'ER_TABLE_EXISTS_ERROR') {
           await setTimeoutPromise(2000);
-          this.checkDb();
+          await this.checkDb();
         } else {
           common_error('Unable to create %s table: [%s] %s', this.version_table, e.code, e.message);
           process.exit(90);
@@ -121,14 +127,16 @@ class UpgradeManager {
       let row;
       try {
         row = await this.client.get(`${sqlCheck} for update`);
+        common_debug('Versions: %s vs %s', row.value, targetVersion);
         if (row.value === targetVersion) {
-          common_debug('Version is equal: %s vs %s, set AUTOCOMMIT=1', row.value, targetVersion);
+          common_debug('version are equal, rollback + SET AUTOCOMMIT=1');
           await this.client.run('ROLLBACK');
           await this.client.run('SET AUTOCOMMIT=1');
         }
         return row;
       } catch (e) {
         await this.client.run('ROLLBACK');
+        await this.client.run('SET AUTOCOMMIT=1');
         if (e.code === 'ER_NO_SUCH_TABLE') {
           return false;
         }
