@@ -62,6 +62,9 @@ class UpgradeManager {
       const row = await this.getCurrentVersion(targetVersion);
       if (row === false) {
         currentVersion = -999;
+      } else if (row === true) {
+        common_info('Check db: same version %s', targetVersion);
+        return true;
       } else if (row) {
         currentVersion = row.value;
       }
@@ -129,9 +132,10 @@ class UpgradeManager {
         row = await this.client.get(`${sqlCheck} for update`);
         common_debug('Versions: %s vs %s', row.value, targetVersion);
         if (row.value === targetVersion) {
-          common_debug('version are equal, rollback + SET AUTOCOMMIT=1');
+          common_debug('versions are equal, rollback + SET AUTOCOMMIT=1');
           await this.client.run('ROLLBACK');
           await this.client.run('SET AUTOCOMMIT=1');
+          return true;
         }
         return row;
       } catch (e) {
@@ -147,6 +151,10 @@ class UpgradeManager {
       try {
         const row = await this.client.get(sqlCheck);
         if (row) {
+          if (row.value === targetVersion) {
+            common_debug('versions are equal');
+            return true;
+          }
           return row;
         }
         return null;
