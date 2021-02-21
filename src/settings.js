@@ -51,6 +51,7 @@ export const loadDbEnvSettings = function(settings = {}) {
   const {
     DB_USER,
     DB_PASSWORD,
+    DB_PASSWORD_FILE,
     DB_HOST,
     DB_NAME,
     DB_PORT,
@@ -66,7 +67,7 @@ export const loadDbEnvSettings = function(settings = {}) {
   if (!DB_USER && !settings.config.user) {
     throw new Error('DB ERROR! mysql requires DB_USER');
   }
-  if (!DB_PASSWORD && !settings.config.password) {
+  if (!DB_PASSWORD && !DB_PASSWORD_FILE && !settings.config.password) {
     throw new Error('DB ERROR! mysql requires DB_PASSWORD');
   }
   if (!DB_NAME && !settings.config.database) {
@@ -86,8 +87,12 @@ export const loadDbEnvSettings = function(settings = {}) {
   if (DB_USER) {
     settings.config.user = DB_USER;
   }
-  if (DB_PASSWORD) {
-    settings.config.password = DB_PASSWORD;
+  if (DB_PASSWORD_FILE) {
+    settings.config.password = fs.readFileSync(DB_PASSWORD_FILE, 'utf8');
+  } else {
+    if (DB_PASSWORD) {
+      settings.config.password = DB_PASSWORD;
+    }
   }
   if (DB_NAME) {
     settings.config.database = DB_NAME;

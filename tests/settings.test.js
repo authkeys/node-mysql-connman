@@ -247,6 +247,29 @@ describe('Testing settings', () => {
       done();
     });
 
+    it('Should set the correct minimal settings', done => {
+      const config = {
+        DB_USER: 'testuser',
+        DB_PASSWORD_FILE: 'tests/assets/password_file.txt',
+        DB_HOST: 'testhost',
+        DB_NAME: 'testdb',
+        DB_PORT: 13306
+      };
+      mergeObjects(config, process.env);
+      const settings = loadDbEnvSettings({});
+      assert.strictEqual(settings.config.host, config.DB_HOST);
+      assert.strictEqual(settings.config.database, config.DB_NAME);
+      assert.strictEqual(settings.config.port, config.DB_PORT);
+      assert.strictEqual(settings.config.user, config.DB_USER);
+      assert.strictEqual(settings.config.password, 'sup3rSecret!');
+      assert.strictEqual(settings.config.timezone, 'Z');
+      assert.strictEqual(settings.config.waitForConnections, true);
+      assert.isUndefined(settings.config.ssl);
+      assert.isFalse(settings.noDbPool);
+      assert.isUndefined(settings.cluster);
+      done();
+    });
+
     it('Should set the correct full settings', done => {
       const config = {
         DB_USER: 'testuser',
