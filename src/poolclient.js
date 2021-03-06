@@ -135,6 +135,17 @@ class MariadbPoolClient {
       });
     });
   }
+
+  raw_query(sql) {
+    return new Promise((resolve, reject) => {
+      this.conn.query(sql, function(err, rows) {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(rows);
+      });
+    });
+  }
 }
 
 export default MariadbPoolClient;
