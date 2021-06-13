@@ -12,6 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+let useTracer;
+let instrumentAsync;
+let instrumentSync;
+
+try {
+  const { instrumentAsync: iasync, instrumentSync: isync } = require('@fluidware-it/opentracing-injector');
+  instrumentAsync = iasync;
+  instrumentSync = isync;
+  useTracer = true;
+  console.debug('@fluidware-it/opentracing-injector present, tracing enable');
+} catch (e) {
+  console.debug('@fluidware-it/opentracing-injector not present, tracing disable');
+}
+
 class MariadbPoolClient {
   db;
 
@@ -24,7 +38,15 @@ class MariadbPoolClient {
     this.pool = pool;
   }
 
-  open() {
+  open(span) {
+    if (!useTracer) return this._open();
+    this.span = span;
+    return instrumentAsync('db open', { childOf: span }, false, () => {
+      return this._open();
+    });
+  }
+
+  _open() {
     return new Promise((resolve, reject) => {
       this.db.getConnection((err, conn) => {
         if (err) {
@@ -38,6 +60,13 @@ class MariadbPoolClient {
   }
 
   close() {
+    if (!useTracer) return this._close();
+    instrumentSync('db close', { childOf: this.span }, false, () => {
+      this._close();
+    });
+  }
+
+  _close() {
     if (this.conn) {
       this.conn.release();
     }
@@ -63,6 +92,13 @@ class MariadbPoolClient {
   }
 
   all(sql, params) {
+    if (!useTracer) return this._all(sql, params);
+    return instrumentAsync('db all', { childOf: this.span }, { sql }, () => {
+      return this._all(sql, params);
+    });
+  }
+
+  _all(sql, params) {
     return new Promise((resolve, reject) => {
       this.conn.execute(sql, params, (err, rows) => {
         if (err) {
@@ -74,6 +110,13 @@ class MariadbPoolClient {
   }
 
   get(sql, params) {
+    if (!useTracer) return this._get(sql, params);
+    return instrumentAsync('db get', { childOf: this.span }, { sql }, () => {
+      return this._get(sql, params);
+    });
+  }
+
+  _get(sql, params) {
     return new Promise((resolve, reject) => {
       try {
         this.conn.execute(sql, params, (err, row) => {
@@ -90,6 +133,13 @@ class MariadbPoolClient {
   }
 
   run(sql, params) {
+    if (!useTracer) return this._run(sql, params);
+    return instrumentAsync('db run', { childOf: this.span }, { sql }, () => {
+      return this._run(sql, params);
+    });
+  }
+
+  _run(sql, params) {
     return new Promise((resolve, reject) => {
       this.conn.execute(sql, params, (err, results, fields) => {
         if (err) {
@@ -101,6 +151,13 @@ class MariadbPoolClient {
   }
 
   insert(sql, params) {
+    if (!useTracer) return this._insert(sql, params);
+    return instrumentAsync('db insert', { childOf: this.span }, { sql }, () => {
+      return this._insert(sql, params);
+    });
+  }
+
+  _insert(sql, params) {
     return new Promise((resolve, reject) => {
       this.conn.execute(sql, params, function(err, results) {
         if (err) {
@@ -113,6 +170,13 @@ class MariadbPoolClient {
   }
 
   update(sql, params) {
+    if (!useTracer) return this._update(sql, params);
+    return instrumentAsync('db update', { childOf: this.span }, { sql }, () => {
+      return this._update(sql, params);
+    });
+  }
+
+  _update(sql, params) {
     return new Promise((resolve, reject) => {
       this.conn.execute(sql, params, function(err, results) {
         if (err) {
@@ -125,6 +189,13 @@ class MariadbPoolClient {
   }
 
   delete(sql, params) {
+    if (!useTracer) return this._delete(sql, params);
+    return instrumentAsync('db delete', { childOf: this.span }, { sql }, () => {
+      return this._delete(sql, params);
+    });
+  }
+
+  _delete(sql, params) {
     return new Promise((resolve, reject) => {
       this.conn.execute(sql, params, function(err, results) {
         if (err) {

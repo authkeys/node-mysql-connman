@@ -15,7 +15,7 @@
 import MariadbPoolClusterClient from './poolclusterclient';
 
 class MariadbClusterClient extends MariadbPoolClusterClient {
-  close() {
+  _close() {
     if (this.conn) {
       this.conn.destroy();
     }

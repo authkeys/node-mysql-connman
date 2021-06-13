@@ -15,7 +15,7 @@
 import MariadbPoolClient from './poolclient';
 
 class MariadbClient extends MariadbPoolClient {
-  close() {
+  _close() {
     if (this.conn) {
       this.conn.destroy();
     }

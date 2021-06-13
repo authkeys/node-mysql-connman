@@ -15,7 +15,7 @@
 import MariadbBaseClient from './poolclient';
 
 class MariadbPoolClusterClient extends MariadbBaseClient {
-  open() {
+  _open() {
     return new Promise((resolve, reject) => {
       this.db.getConnection((this.pool || 'rw') + '*', (err, conn) => {
         if (err) {
