@@ -247,3 +247,23 @@ const selectRows = async minId => {
 
 ```
 
+#### raw query
+
+`raw_query(sql)`
+
+Raw query
+
+```
+
+const selectRows = async () => {
+    const client = connectionManager.getClient();
+    await client.open();
+    const rows = await client.raw_query('select id, col1 from tab1') ;
+    rows.forEach(row => {
+        const { id, col1 } = row;
+        console.log('id: %s, col1: %s', id, col1);
+    });
+    client.close();
+});
+
+```
