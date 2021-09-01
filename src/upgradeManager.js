@@ -131,8 +131,8 @@ class UpgradeManager {
       try {
         row = await this.client.get(`${sqlCheck} for update`);
         common_debug('Versions: %s vs %s', row.value, targetVersion);
-        if (row.value === targetVersion) {
-          common_debug('versions are equal, rollback + SET AUTOCOMMIT=1');
+        if (row.value >= targetVersion) {
+          common_debug('nothing to do, rollback + SET AUTOCOMMIT=1');
           await this.client.run('ROLLBACK');
           await this.client.run('SET AUTOCOMMIT=1');
           return true;
@@ -153,6 +153,10 @@ class UpgradeManager {
         if (row) {
           if (row.value === targetVersion) {
             common_debug('versions are equal');
+            return true;
+          }
+          if (row.value > targetVersion) {
+            common_debug('current version is greater');
             return true;
           }
           return row;
