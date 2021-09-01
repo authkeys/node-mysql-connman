@@ -15,11 +15,17 @@
 let useTracer;
 let instrumentAsync;
 let instrumentSync;
+let getOpenTracer;
 
 try {
-  const { instrumentAsync: iasync, instrumentSync: isync } = require('@fluidware-it/opentracing-injector');
+  const {
+    instrumentAsync: iasync,
+    instrumentSync: isync,
+    getOpenTracer: gto
+  } = require('@fluidware-it/opentracing-injector');
   instrumentAsync = iasync;
   instrumentSync = isync;
+  getOpenTracer = gto;
   useTracer = true;
   console.debug('@fluidware-it/opentracing-injector present, tracing enable');
 } catch (e) {
@@ -33,13 +39,23 @@ class MariadbPoolClient {
 
   pool;
 
+  useTracer;
+
   constructor(db, pool = false) {
     this.db = db;
     this.pool = pool;
+    if (useTracer) {
+      try {
+        getOpenTracer();
+        this.useTracer = true;
+      } catch (e) {
+        // console.log('opentracing-injector is present but not configured. disabling it');
+      }
+    }
   }
 
   open(span) {
-    if (!useTracer) return this._open();
+    if (!this.useTracer) return this._open();
     this.span = span;
     return instrumentAsync('db open', { childOf: span }, false, () => {
       return this._open();
@@ -60,7 +76,7 @@ class MariadbPoolClient {
   }
 
   close() {
-    if (!useTracer) return this._close();
+    if (!this.useTracer) return this._close();
     instrumentSync('db close', { childOf: this.span }, false, () => {
       this._close();
     });
@@ -92,7 +108,7 @@ class MariadbPoolClient {
   }
 
   all(sql, params) {
-    if (!useTracer) return this._all(sql, params);
+    if (!this.useTracer) return this._all(sql, params);
     return instrumentAsync('db all', { childOf: this.span }, { sql }, () => {
       return this._all(sql, params);
     });
@@ -110,7 +126,7 @@ class MariadbPoolClient {
   }
 
   get(sql, params) {
-    if (!useTracer) return this._get(sql, params);
+    if (!this.useTracer) return this._get(sql, params);
     return instrumentAsync('db get', { childOf: this.span }, { sql }, () => {
       return this._get(sql, params);
     });
@@ -133,7 +149,7 @@ class MariadbPoolClient {
   }
 
   run(sql, params) {
-    if (!useTracer) return this._run(sql, params);
+    if (!this.useTracer) return this._run(sql, params);
     return instrumentAsync('db run', { childOf: this.span }, { sql }, () => {
       return this._run(sql, params);
     });
@@ -151,7 +167,7 @@ class MariadbPoolClient {
   }
 
   insert(sql, params) {
-    if (!useTracer) return this._insert(sql, params);
+    if (!this.useTracer) return this._insert(sql, params);
     return instrumentAsync('db insert', { childOf: this.span }, { sql }, () => {
       return this._insert(sql, params);
     });
@@ -170,7 +186,7 @@ class MariadbPoolClient {
   }
 
   update(sql, params) {
-    if (!useTracer) return this._update(sql, params);
+    if (!this.useTracer) return this._update(sql, params);
     return instrumentAsync('db update', { childOf: this.span }, { sql }, () => {
       return this._update(sql, params);
     });
@@ -189,7 +205,7 @@ class MariadbPoolClient {
   }
 
   delete(sql, params) {
-    if (!useTracer) return this._delete(sql, params);
+    if (!this.useTracer) return this._delete(sql, params);
     return instrumentAsync('db delete', { childOf: this.span }, { sql }, () => {
       return this._delete(sql, params);
     });
